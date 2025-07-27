@@ -1,0 +1,26 @@
+- name: Add nginx configuration
+  ansible.builtin.copy:
+    src: ./roles/web/files/nginx.conf
+    dest: /var/www/app/
+    owner: "{{ ansible_user }}"
+    mode: '0775'
+
+- name: Add html file
+  ansible.builtin.copy:
+    src: ./roles/web/files/index.html
+    dest: /var/www/app/public/
+    owner: "{{ ansible_user }}"
+    mode: '0775'
+
+- name: Run NGINX container
+  ansible.builtin.docker_container:
+    name: nginx_viewer
+    image: nginx:latest
+    volumes:
+      - /var/www/app/public:/usr/share/nginx/html:ro
+      - /var/www/app/nginx.conf:/etc/nginx/nginx.conf:ro
+      # - ./roles/web/files/index.html:/usr/share/nginx/html/index.html:ro
+    published_ports:
+      - "80:80"
+    restart: yes
+    restart_policy: unless-stopped

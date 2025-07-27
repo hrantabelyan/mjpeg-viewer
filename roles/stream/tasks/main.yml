@@ -1,0 +1,17 @@
+- name: Ensure image saving output directory exists
+  ansible.builtin.file:
+    path: /var/www/app/public
+    state: directory
+    mode: '0775'
+
+- name: Run FFmpeg container
+  ansible.builtin.docker_container:
+    name: ffmpeg_stream
+    image: jrottenberg/ffmpeg:6-ubuntu-edge
+    volumes:
+      - /var/www/app/public:/var/www/html
+    command: >
+      -y -re -stream_loop -1 -i http://webcam.schwaebischhall.de/mjpg/video.mjpg
+      -vf fps=1 -update 1 /var/www/html/index.jpg
+    restart: yes
+    restart_policy: unless-stopped

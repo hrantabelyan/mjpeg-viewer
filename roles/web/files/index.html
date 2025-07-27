@@ -1,0 +1,35 @@
+<html>
+   <head>
+        <style>
+            body {
+                margin: 0;
+                padding: 0;
+                background-color: #eee;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            @media (prefers-color-scheme: dark) {
+                body {
+                    background-color: #222;
+                }
+            }
+
+            img {
+                max-width: 100%;
+                height: auto;
+            }
+        </style>
+   </head>
+  <body>
+    <img id="main-image" src="index.jpg">
+
+    <script>
+        setInterval(async () => {
+            await fetch("index.jpg", { cache: 'reload'})
+            document.body.querySelector('#main-image').src = 'index.jpg';
+        }, 3000)
+    </script>
+  </body>
+</html>

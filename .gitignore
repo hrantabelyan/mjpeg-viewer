@@ -1,0 +1,53 @@
+# Byte-compiled / cache files
+__pycache__/
+*.py[cod]
+*.swp
+*.swo
+*.bak
+
+# Logs and local files
+*.log
+*.retry
+*.out
+
+# SSH and Ansible vault files (be cautious!)
+*.pem
+*.key
+*.vault
+
+# Environment files
+.env
+.env.*
+
+# Inventory and variable files that may be local only
+inventory/*.ini
+inventory/*.yml
+inventory/*.yaml
+host_vars/
+group_vars/
+
+# Avoid ignoring all vars if some are meant to be versioned
+# !group_vars/all.yml
+# !host_vars/production.yml
+
+# Roles from Galaxy or external sources (optional)
+# roles/*/
+# !roles/requirements.yml
+
+# Vagrant
+.vagrant/
+
+# Molecule testing
+.molecule/
+*.tar.gz
+test.log
+
+# Editor/IDE specific
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# MacOS and system files
+.DS_Store
+Thumbs.db

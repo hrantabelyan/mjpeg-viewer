@@ -1,0 +1,80 @@
+- name: Gather the package facts
+  ansible.builtin.package_facts:
+    manager: auto
+
+# - name: Print the package facts
+#   ansible.builtin.debug:
+#     var: ansible_facts.packages
+
+- name: Check if Docker is installed
+  ansible.builtin.command: which docker
+  register: docker_check
+  ignore_errors: true
+  changed_when: false
+
+- name: Set docker_installed fact
+  ansible.builtin.set_fact:
+    docker_installed: "{{ docker_check.rc == 0 }}"
+
+- name: Set reset_connection_after_adding_to_docker_group fact
+  ansible.builtin.set_fact:
+    reset_connection_after_adding_to_docker_group: "yes"
+  when: not docker_installed
+
+- name: Set reset_connection_after_adding_to_docker_group fact
+  ansible.builtin.set_fact:
+    reset_connection_after_adding_to_docker_group: "no"
+  when: docker_installed
+
+- name: Print the package facts
+  ansible.builtin.debug:
+    msg: "docker is already installed"
+  when: docker_installed
+
+- name: Print the package facts
+  ansible.builtin.debug:
+    msg: "docker is not installed"
+  when: not docker_installed
+
+- name: Download docker install script
+  ansible.builtin.get_url:
+    url: "https://get.docker.com"
+    dest: "/tmp/get-docker.sh"
+    mode: "0755"
+  when: not docker_installed
+
+- name: Install docker
+  ansible.builtin.shell: "/tmp/get-docker.sh"
+  when: not docker_installed
+
+- name: Ensure group "docker" exists
+  ansible.builtin.group:
+    name: docker
+    state: present
+  when: docker_installed
+
+- name: Add user to group docker
+  ansible.builtin.user:
+    name: "{{ ansible_user }}"
+    groups: docker
+    append: yes
+    state: present
+  when: docker_installed
+
+# - name: Check reset_connection_after_adding_to_docker_group fact value
+#   ansible.builtin.debug:
+#     var: reset_connection_after_adding_to_docker_group
+
+- name: Reset connection to activate the changes to groups
+  ansible.builtin.include_tasks: reset_connection.yml
+  when: reset_connection_after_adding_to_docker_group
+
+- name: Make sure that docker service is enabled
+  ansible.builtin.systemd:
+    name: docker.service
+    enabled: true
+
+- name: Make sure that containerd service is enabled
+  ansible.builtin.systemd:
+    name: containerd.service
+    enabled: true
